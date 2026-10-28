@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+ <!-- ナビゲーションバー -->
+ <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-primary" href="{% url 'app:post_list' %}"><i class="bi bi-layers-fill me-2"></i>音ゲーを作ろう</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'app:post_list' %}">Home</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+ </nav>
+ 
+ <!-- メインコンテンツ -->
+ <div class="container my-4">
+  <div class="row g-4">
+   
+   <!-- 左サイドバー -->
+   <div class="col-lg-3">
+    <div class="card border-0 shadow-sm p-3">
+     <div class="card-body text-center">
+        <img src = "{% static 'images\TAPkey広告2.png' %}" class="img-fluid" alt="サンプル画像">
+     </div>
+    </div>
+   </div> 
+
+   <!-- 真ん中（メイン記事） -->
+   <div class="col-lg-6">
+     <article>
+        <h1>{{ post.title }}</h1>
+        <p>作成日: {{ post.created_at }}</p>
+        <hr>
+        <!-- Markdownから変換されたHTMLを表示する -->
+        <div>
+            {{ post.content_html|safe }}
+        </div>
+    </article>
+   </div> 
+
+   <!-- 右サイドバー -->  
+   <div class="col-lg-3">
+    <div class="card border-0 shadow-sm p-3">
+     <div class="card-body text-center">
+       <img src = "{% static 'images\TAPkey広告.png' %}" class="img-fluid" alt="サンプル画像">
+     </div>
+    </div>
+   </div>
+  
+  </div> 
+ </div>
+
+ <!-- フッター -->
+ <footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+      <p class="mb-0">&copy; 2026 音ゲーを作ろう. All rights reserved.</p>
+    </div>
+ </footer>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

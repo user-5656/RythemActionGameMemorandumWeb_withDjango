@@ -1,0 +1,23 @@
+# Pythonのキャッシュファイル
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 仮想環境（フォルダ名が venv ではない場合は、実際のフォルダ名に変更してください）
+venv/
+.venv/
+env/
+
+# Djangoのローカルデータベース（SQLite3）
+*.sqlite3
+
+# 開発環境の設定や秘密情報（環境変数ファイルなど）
+.env
+
+# OSが自動生成するゴミファイル
+.DS_Store
+Thumbs.db
+
+# IDE・エディタの設定（VS CodeやPyCharmなど）
+.vscode/
+.idea/

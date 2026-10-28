@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音ゲーを作ろう</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+ <!-- ナビゲーションバー -->
+ <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-primary" href="#"><i class="bi bi-layers-fill me-2"></i>音ゲーを作ろう</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Dropdown
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+ </nav>
+ 
+ <!-- メインコンテンツ -->
+ <div class="container my-4">
+  <div class="row g-4">
+   
+   <!-- 左サイドバー -->
+   <div class="col-lg-3">
+    <div class="card border-0 shadow-sm p-3">
+     <div class="card-body text-center">
+        <h4 class="fw-bold mb-3">メニュー</h4>
+        <p class="text-muted">何か</p>
+     </div>
+    </div>
+   </div> 
+
+   <!-- 真ん中（メイン記事） -->
+   <div class="col-lg-6">
+    <div class="card border-0 shadow-sm p-4 p-md-5">
+     
+       <h1 class="h3 fw-bold mb-2">とあるサイトの話をUnityに導入した件</h1>
+       <p class="text-muted mb-4">あるサイトの話をUnityに導入した際の経験をここに記す。</p>
+       
+       <div class="alert alert-light border mb-4">
+         参考サイト: <a href="https://rhythmquestgame.com/devlog/04.html" target="_blank" class="text-decoration-none">https://rhythmquestgame.com/devlog/04.html</a>
+       </div>
+
+       <p>上記のサイトに書かれていた方法をUnity で再現しようと模索した。（途中）</p>
+       
+       <hr class="my-4">
+
+       <h3 class="h4 fw-bold text-primary mt-4">音楽同期とは</h3>
+       <p>音楽同期とは ---音ゲー制作において、音と譜面（描画）のタイミングを合わせることである。</p>
+       <p>Unity では、音源を制御する時間、画面の描画に関する時間の2つがある。これが意味することは、2つの時間をつなげなければならないということだ。</p> 
+       <p>そのつなぐ手法について、こういった概念についてを前提として筆者は話を進めている。</p>
+       
+       <h3 class="h4 fw-bold text-primary mt-4">音源の時間</h3> 
+       <p>Unity では、<code>AudioSettings.dspTime</code> という方法で時間を呼び出せる。</p> 
+       
+       <div class="bg-dark text-light p-3 rounded mb-3 font-monospace small">
+<pre class="mb-0"><code>void Start() { 
+    _audioDspStartTime = AudioSettings.dspTime + kStartScheduleBuffer;
+    _musicSource.PlayScheduled(_audioDspStartTime);
+}</code></pre>
+       </div>
+
+       <p><code>kStartScheduleBuffer</code> は、任意で時間を追加できるようにしたものである。</p>
+       <p><code>_musicSource.PlayScheduled(_audioDspStartTime);</code> では、_musicSourceに入れた音楽ファイルを _audioDspStartTime の秒数だけ待って再生するという意味である。</p> 
+       <p>つまり、音楽を再生するコードである。何ら不思議なことはない。</p> 
+       
+       <h3 class="h4 fw-bold text-primary mt-4">線形回帰は何か、なぜこの話に？</h3> 
+       <p>ゲームの時間と音源の時間を結びつけるために、<strong>線形回帰</strong> を利用しようという話である。ここで注意。</p>
+       
+       <div class="bg-dark text-light p-3 rounded mb-3 font-monospace small">
+<pre class="mb-0"><code>void Update() {
+    float currentGameTime = Time.realtimeSinceStartup;
+    double currentDspTime = AudioSettings.dspTime;
+
+    // 線形回帰モデルに別のデータポイントを追加して更新します。
+    UpdateLinearRegression(currentGameTime, currentDspTime);
+}</code></pre>
+       </div>
+       
+       <p>このコードは、このままでは、Unity 上で動かない。<code>UpdateLinearRegression(currentGameTime, currentDspTime);</code> とは何ぞやといわれる。絶望である。</p>
+       <p><code>UpdateLinearRegression(currentGameTime, currentDspTime);</code> を用いるための手法を模索した。</p>
+       <p>今回私が一番紹介したいことだ。長い時間を費やすことなく、スムーズに次のステップにいく手助けになればと思う。</p>
+       <p><code>UpdateLinearRegression</code> を用いるための手法は NuGet を導入し、<code>MathNet.Numerics</code>をダウンロードする。</p>
+       
+       <div class="card bg-light border-0 p-3 mb-3">
+         <p class="mb-1 fw-bold">導入手順:</p>
+         <ol class="mb-0 ps-3">
+           <li>Unityを開き、上のメニューから 「Window」 ＞ 「Package Manager」</li>
+           <li>左上の「＋」ボタン ＞ 「Add package from git URL...」</li>
+           <li>以下のURLを貼り付けて「Add」をクリック<br>
+             <code class="small text-break">https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity</code>
+           </li>
+           <li>「NuGet」 ＞ 「Manage NuGet Packages」 を開き、そこで <code>MathNet.Numerics</code> と <code>System.Text.Json</code> を検索してインストール。System.Text.Json のバージョンは、8.0.5にすること。（2026年8月現在）</li>
+         </ol>
+       </div>
+
+       <p>そうして以下のように <code>void Update()</code>に入れる</p>
+       
+       <div class="bg-dark text-light p-3 rounded mb-3 font-monospace small">
+<pre class="mb-0"><code>double Ga = currentGameTime;
+double Ds = currentDspTime;
+
+Gdata.Add(Ga);
+Ddata.Add(Ds);
+
+if (Gdata.Count > 10 && Ddata.Count > 10)
+{
+    Gdata.RemoveAt(0);
+    Ddata.RemoveAt(0);
+}
+
+if (Gdata.Count < 2 || Ddata.Count < 2) return;
+
+p = Fit.Polynomial(Gdata.ToArray(), Ddata.ToArray(), 1);</code></pre>
+       </div>
+       
+       <p>これにより、線形回帰ができる。</p>
+       <p class="text-danger small">※ しかし、デバイスによっては、重すぎて描画がカクカクになってしまうので、線形回帰する回数を数秒に1回などと決めることも大切である。</p>
+
+    </div>
+   </div> 
+
+   <!-- 右サイドバー -->  
+   <div class="col-lg-3">
+    <div class="card border-0 shadow-sm p-3">
+     <div class="card-body text-center">
+       <h4 class="fw-bold mb-3">プロフィール等</h4>
+       <p class="text-muted">何か</p>
+     </div>
+    </div>
+   </div>
+  
+  </div> 
+ </div>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
